@@ -1,0 +1,29 @@
+import React from 'react'
+import { render, screen } from '@testing-library/react'
+import ContactEmail from '../../src/components/policy/ContactEmail'
+import { PENDING_TEXT, siteConfig } from '../../src/lib/site.config'
+
+// The contact email in policy and error-page prose: a mailto link when set,
+// and the visible "awaiting information" text (never an empty mailto: link)
+// while the charity has not supplied one.
+describe('ContactEmail', () => {
+  const original = siteConfig.contactEmail
+  afterEach(() => {
+    siteConfig.contactEmail = original
+  })
+
+  it('links the configured address', () => {
+    siteConfig.contactEmail = 'hello@example.org'
+    render(<ContactEmail className="x" />)
+    const link = screen.getByRole('link', { name: 'hello@example.org' })
+    expect(link).toHaveAttribute('href', 'mailto:hello@example.org')
+    expect(link).toHaveClass('x')
+  })
+
+  it('shows the placeholder as plain text when no address is configured', () => {
+    siteConfig.contactEmail = ''
+    const { container } = render(<ContactEmail className="x" />)
+    expect(screen.getByText(PENDING_TEXT).closest('a')).toBeNull()
+    expect(container.querySelector('a')).toBeNull()
+  })
+})
