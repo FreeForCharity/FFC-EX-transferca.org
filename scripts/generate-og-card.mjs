@@ -83,6 +83,16 @@ export function cardPalette(backgroundHex) {
 
 const el = React.createElement
 
+/**
+ * The card's bottom line. The EIN part is left out while the EIN is empty (it
+ * is awaiting the charity, see siteConfig.pending), rather than baking a
+ * dangling "EIN " into the committed PNG.
+ */
+export function cardFootnote(siteConfig) {
+  const ein = String(siteConfig.ein ?? '').trim()
+  return `Supported by ${siteConfig.supportedBy.name}${ein ? ` · EIN ${ein}` : ''}`
+}
+
 export function cardElement(siteConfig, description) {
   const palette = cardPalette(siteConfig.themeColor)
 
@@ -132,7 +142,7 @@ export function cardElement(siteConfig, description) {
     el(
       'div',
       { style: { display: 'flex', fontSize: 24, color: palette.footnote } },
-      `Supported by ${siteConfig.supportedBy.name} · EIN ${siteConfig.ein}`
+      cardFootnote(siteConfig)
     )
   )
 }

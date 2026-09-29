@@ -60,6 +60,17 @@ describe('social card palette', () => {
     expect(evaluate("m.relativeLuminance('ffffff')")).toBeCloseTo(1, 5)
   })
 
+  // A pending EIN is empty: the footnote drops the EIN rather than baking a
+  // dangling "EIN " into the committed PNG.
+  it('leaves an empty EIN out of the footnote', () => {
+    const config = (ein: string) =>
+      JSON.stringify({ ein, supportedBy: { name: 'Free For Charity' } })
+    expect(evaluate(`m.cardFootnote(${config('')})`)).toBe('Supported by Free For Charity')
+    expect(evaluate(`m.cardFootnote(${config('12-3456789')})`)).toBe(
+      'Supported by Free For Charity · EIN 12-3456789'
+    )
+  })
+
   // Importing the module must not render or write anything: the test above
   // would otherwise overwrite public/og-card.png on every run.
   it('does not render when imported', () => {
